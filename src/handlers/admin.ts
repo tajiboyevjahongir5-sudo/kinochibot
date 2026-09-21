@@ -57,9 +57,16 @@ adminHandler.on('message', async (ctx, next) => {
   const userId = ctx.from!.id;
   const state = adminStates.get(userId);
 
+  const mainKeys = [
+    '/admin', '❌ Panelni yopish', '🤖 Avto-Tarqatmalar',
+    '➕ Kino qo\\'shish', '👥 Foydalanuvchilar', '📢 Xabar yuborish',
+    '📋 Kinolar ro\\'yxati', '🗑️ Kino o\\'chirish', '🔒 Majburiy obuna',
+    '⚙️ Sozlamalar'
+  ];
+
   if (state?.type === 'broadcast_waiting_message') {
     const text = ctx.message.text?.trim();
-    if (text === '/admin' || text === '❌ Panelni yopish' || text === '📢 Xabar yuborish') {
+    if (text && mainKeys.includes(text)) {
       await next();
       return;
     }
@@ -114,7 +121,7 @@ adminHandler.on('message', async (ctx, next) => {
 
   if (state?.type === 'autobroadcast_waiting_message') {
     const text = ctx.message.text?.trim();
-    if (text === '/admin' || text === '❌ Panelni yopish' || text === '🤖 Avto-Tarqatmalar') {
+    if (text && mainKeys.includes(text)) {
       await next();
       return;
     }
@@ -261,9 +268,12 @@ const handleAutoBroadcastButton = async (ctx: any) => {
   const { AutoMessage } = await import('../models/AutoMessage');
   const count = await AutoMessage.countDocuments();
   
+  const keyboard = new InlineKeyboard()
+    .text('🗑 Barchasini tozalash', 'admin:clear_autobroadcast');
+
   await ctx.reply(
-    `🤖 <b>Avto-Tarqatmalar</b>\n\nBazada jami <b>${count}</b> ta avto-xabar mavjud.\n\nYangi xabar qo'shish uchun uni shu yerga yuboring (rasm, video yoki matn bo'lishi mumkin).\n\n<i>Avto-xabarlar har kuni soat 10:00, 15:00 va 20:00 da hammaga tarqatiladi.</i>\n\n❌ Bekor qilish uchun /admin yozing.`,
-    { parse_mode: 'HTML' }
+    `🤖 <b>Avto-Tarqatmalar</b>\n\nBazada jami <b>${count}</b> ta avto-xabar mavjud.\n\nYangi xabar qo'shish uchun uni shu yerga yuboring (rasm, video yoki matn bo'lishi mumkin).\n\n<i>Avto-xabarlar har kuni soat 10:00, 15:00 va 20:00 da hammaga tarqatiladi.</i>\n\n❌ Bekor qilish uchun tugmalardan birini bosing.`,
+    { parse_mode: 'HTML', reply_markup: keyboard }
   );
 };
 
@@ -513,6 +523,13 @@ adminHandler.callbackQuery(/^admin:msg_user:(\d+)$/, async (ctx) => {
   adminStates.set(ctx.from.id, { type: 'send_waiting_message', targetId });
   await ctx.answerCallbackQuery();
   await ctx.reply(`✍️ <b>ID: ${targetId} ga xabar yuborish</b>\n\nYubormoqchi bo'lgan xabaringizni yozing (rasm, video yoki matn).\n\n❌ Bekor qilish uchun /admin yozing`, { parse_mode: 'HTML' });
+});
+
+adminHandler.callbackQuery('admin:clear_autobroadcast', async (ctx) => {
+  const { AutoMessage } = await import('../models/AutoMessage');
+  await AutoMessage.deleteMany({});
+  await ctx.answerCallbackQuery('✅ Barcha avto-tarqatmalar o\\'chirildi!');
+  await ctx.editMessageText('✅ <b>Barcha avto-tarqatmalar o\\'chirildi!</b>\n\nEndi baza bo\\'sh. Yangi xabar qo\\'shishingiz mumkin.', { parse_mode: 'HTML' });
 });
 
 // ─── TEXT MESSAGE HANDLER ─────────────────────────────────────────────────────
