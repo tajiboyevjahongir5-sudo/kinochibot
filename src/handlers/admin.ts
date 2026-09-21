@@ -59,8 +59,8 @@ adminHandler.on('message', async (ctx, next) => {
 
   const mainKeys = [
     '/admin', '❌ Panelni yopish', '🤖 Avto-Tarqatmalar',
-    '➕ Kino qo\\'shish', '👥 Foydalanuvchilar', '📢 Xabar yuborish',
-    '📋 Kinolar ro\\'yxati', '🗑️ Kino o\\'chirish', '🔒 Majburiy obuna',
+    "➕ Kino qo'shish", '👥 Foydalanuvchilar', '📢 Xabar yuborish',
+    "📋 Kinolar ro'yxati", "🗑️ Kino o'chirish", '🔒 Majburiy obuna',
     '⚙️ Sozlamalar'
   ];
 
@@ -528,8 +528,8 @@ adminHandler.callbackQuery(/^admin:msg_user:(\d+)$/, async (ctx) => {
 adminHandler.callbackQuery('admin:clear_autobroadcast', async (ctx) => {
   const { AutoMessage } = await import('../models/AutoMessage');
   await AutoMessage.deleteMany({});
-  await ctx.answerCallbackQuery('✅ Barcha avto-tarqatmalar o\\'chirildi!');
-  await ctx.editMessageText('✅ <b>Barcha avto-tarqatmalar o\\'chirildi!</b>\n\nEndi baza bo\\'sh. Yangi xabar qo\\'shishingiz mumkin.', { parse_mode: 'HTML' });
+  await ctx.answerCallbackQuery("✅ Barcha avto-tarqatmalar o'chirildi!");
+  await ctx.editMessageText("✅ <b>Barcha avto-tarqatmalar o'chirildi!</b>\n\nEndi baza bo'sh. Yangi xabar qo'shishingiz mumkin.", { parse_mode: 'HTML' });
 });
 
 // ─── TEXT MESSAGE HANDLER ─────────────────────────────────────────────────────
